@@ -4,3 +4,5 @@ app/__pycache__/
 /.pytest_cache/
 .idea/
 **/__pycache__/
+/bin
+/lib
