@@ -1,11 +1,8 @@
-from pydantic import BaseModel
 from app.data.connect import Connection
 from app.core.config import CF_NEAREST_NEIGHBORS
 from fastapi import Depends
-from loguru import logger
 
-from app.models.recommendation import Recommendation, Query
-from app.models.item_score import ItemScore
+from app.models.recommendation import Query
 
 
 class UserToUserCollabRecommender:
@@ -49,16 +46,4 @@ class UserToUserCollabRecommender:
             self._query_tpl.format(user_id=self.user_id, number=self.number, nearest_neighbors=self.nearest_neighbors)
         )
         rows = result.single()
-        # logger.debug(result._records)
-        # for row in result._records:
-        #     for record in row:
-        #         logger.debug(record)
-        # return Recommendation(item_scores=[ItemScore(id=3066)])
-
-        # if result.single() is None:
-        #     logger.debug('None')
-        #     return '{self.user_id}'
-        # else:
-        #     logger.debug('Not None')
-        #     return result.single()[1]
         return rows if rows is not None else [self.user_id, []]
