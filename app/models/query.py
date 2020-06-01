@@ -3,5 +3,5 @@ from pydantic import BaseModel
 
 
 class Query(BaseModel):
-    items: List[int]
+    item: int
     number: int

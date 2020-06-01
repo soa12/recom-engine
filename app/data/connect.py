@@ -1,25 +1,40 @@
-# import asyncpg
-from fastapi import FastAPI
+import string
+from fastapi import Depends
 from loguru import logger
+from neo4j import GraphDatabase
+from pydantic import BaseModel
 
-from app.core.config import DATABASE_URL, MAX_CONNECTIONS_COUNT, MIN_CONNECTIONS_COUNT
-
-
-async def connect_to_db(app: FastAPI) -> None:
-    logger.info("Connecting to {0}", repr(DATABASE_URL))
-
-    app.state.pool = await asyncpg.create_pool(
-        str(DATABASE_URL),
-        min_size=MIN_CONNECTIONS_COUNT,
-        max_size=MAX_CONNECTIONS_COUNT,
-    )
-
-    logger.info("Connection established")
+from app.core.config import DB_URL, DB_USERNAME, DB_PASSWORD
 
 
-async def close_db_connection(app: FastAPI) -> None:
-    logger.info("Closing connection to database")
+def get_driver():
+    return GraphDatabase.driver(DB_URL, auth=(DB_USERNAME, DB_PASSWORD), encrypted=False)
 
-    await app.state.pool.close()
 
-    logger.info("Connection closed")
+class Connection:
+    def __init__(self, driver=Depends(get_driver)):
+        self.driver = driver
+
+    def run_get_query(self, query: string):
+        logger.info("READ query to {0}", repr(DB_URL))
+
+        def fetch(tx, query):
+            return tx.run(query)
+
+        session = self.driver.session()
+        result = session.read_transaction(fetch, query)
+        session.close()
+        logger.info("READ query done")
+        return result
+
+    def close_db_connection(self, query: string, data):
+        logger.info("WRITE query to database")
+
+        def put(tx, query, data):
+            return tx.run(query, **data).single().value()
+
+        session = self.driver.session()
+        result = session.write_transaction(put, query, data)
+        session.close()
+        logger.info("WRITE query done")
+        return result

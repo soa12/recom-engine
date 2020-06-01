@@ -1,7 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError, validator
 
 
 class ItemScore(BaseModel):
     id: int
-    score: float
-
+    # score: float

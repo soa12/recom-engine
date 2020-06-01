@@ -15,12 +15,15 @@ config = Config(".env")
 
 API_KEY: Secret = config("API_KEY", cast=Secret)
 IS_DEBUG: bool = config("IS_DEBUG", cast=bool, default=False)
+CF_NEAREST_NEIGHBORS = config("CF_NEAREST_NEIGHBORS", cast=int, default=10)
 
 # DEFAULT_MODEL_PATH: str = config("DEFAULT_MODEL_PATH")
 
-DATABASE_URL: str = config("DB_URL")
-# MAX_CONNECTIONS_COUNT: int = config("MAX_CONNECTIONS_COUNT", cast=int, default=10)
-# MIN_CONNECTIONS_COUNT: int = config("MIN_CONNECTIONS_COUNT", cast=int, default=10)
+DB_URL: str = config("DB_URL")
+DB_USERNAME: str = config("DB_USERNAME")
+DB_PASSWORD: str = config("DB_PASSWORD")
+MAX_CONNECTIONS_COUNT: int = config("MAX_CONNECTIONS_COUNT", cast=int, default=10)
+MIN_CONNECTIONS_COUNT: int = config("MIN_CONNECTIONS_COUNT", cast=int, default=10)
 
 ALLOWED_HOSTS: List[str] = config(
     "ALLOWED_HOSTS", cast=CommaSeparatedStrings, default="",
